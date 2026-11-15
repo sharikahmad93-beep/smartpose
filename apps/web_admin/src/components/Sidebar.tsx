@@ -24,7 +24,7 @@ export default function Sidebar({ activeTab = 'overview' }: SidebarProps) {
     {
       heading: 'Kitchen & Stock',
       items: [
-        { id: 'catalog', label: 'Menu & Combos', href: '/catalog', icon: '🍛', badge: null },
+        { id: 'catalog', label: 'Menu & Dishes', href: '/catalog', icon: '🍛', badge: '+ Add' },
         { id: 'inventory', label: 'Inventory & GRN', href: '/inventory', icon: '📦', badge: 'Low Stock' },
         { id: 'recipes', label: 'Recipe & Food Cost', href: '/recipes', icon: '🥗', badge: 'BOM' },
       ],

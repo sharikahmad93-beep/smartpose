@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 interface MenuItem {
@@ -36,6 +36,7 @@ const CATALOG_ITEMS: MenuItem[] = [
 const TABLES = ['T-01', 'T-02', 'T-03', 'T-04', 'T-05', 'T-06', 'T-07', 'T-08', 'T-09', 'T-10'];
 
 export default function PosBillingPage() {
+  const [catalogItems, setCatalogItems] = useState<MenuItem[]>(CATALOG_ITEMS);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [vegFilterOnly, setVegFilterOnly] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -52,6 +53,37 @@ export default function PosBillingPage() {
   const [cashTendered, setCashTendered] = useState<number>(1500);
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState<boolean>(false);
   const [kotSentAlert, setKotSentAlert] = useState<boolean>(false);
+
+  // Quick Add Dish Modal in POS
+  const [isQuickAddModalOpen, setIsQuickAddModalOpen] = useState(false);
+  const [quickDishName, setQuickDishName] = useState('');
+  const [quickDishPrice, setQuickDishPrice] = useState<number | ''>('');
+  const [quickDishCat, setQuickDishCat] = useState('Biryani');
+  const [quickDishVeg, setQuickDishVeg] = useState(true);
+  const [quickDishCode, setQuickDishCode] = useState('');
+
+  // Load persisted items from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('smart_pos_menu_items');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const mapped: MenuItem[] = parsed.map((p: any) => ({
+            id: String(p.id),
+            name: p.name,
+            short_code: p.short_code,
+            category: p.category.includes('Biryani') ? 'Biryani' : p.category.includes('Starter') ? 'Starters' : p.category.includes('Bread') ? 'Breads' : p.category.includes('Beverage') ? 'Drinks' : p.category,
+            price: Number(p.base_price || p.price),
+            is_veg: Boolean(p.is_veg),
+          }));
+          setCatalogItems(mapped);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Cart operations
   const addToCart = (item: MenuItem) => {
@@ -83,15 +115,19 @@ export default function PosBillingPage() {
   const grandTotal = Math.round(taxableAmount + cgst + sgst);
   const changeDue = Math.max(0, cashTendered - grandTotal);
 
-  // Filtered menu items
-  const filteredItems = CATALOG_ITEMS.filter((item) => {
-    const matchesCat = selectedCategory === 'All' || item.category === selectedCategory;
+  // Filtered menu items from dynamic catalogItems state
+  const filteredItems = catalogItems.filter((item) => {
+    const matchesCat = selectedCategory === 'All' || item.category.toLowerCase().includes(selectedCategory.toLowerCase());
     const matchesVeg = !vegFilterOnly || item.is_veg;
     const matchesSearch =
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.short_code.toLowerCase().includes(searchQuery.toLowerCase());
+      item.short_code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCat && matchesVeg && matchesSearch;
   });
+
+  // Dynamically extract categories
+  const allCategories = ['All', ...Array.from(new Set(catalogItems.map((i) => i.category)))];
 
   const handleSendKot = () => {
     setKotSentAlert(true);
@@ -101,6 +137,48 @@ export default function PosBillingPage() {
   const handleSettle = () => {
     setIsPaymentModalOpen(false);
     setIsReceiptModalOpen(true);
+  };
+
+  const handleSaveQuickDish = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickDishName.trim() || !quickDishPrice) return;
+
+    const newItem: MenuItem = {
+      id: `dish-${Date.now()}`,
+      name: quickDishName.trim(),
+      short_code: quickDishCode.trim() || `D${Date.now().toString().slice(-3)}`,
+      category: quickDishCat,
+      price: Number(quickDishPrice),
+      is_veg: quickDishVeg,
+    };
+
+    const updated = [newItem, ...catalogItems];
+    setCatalogItems(updated);
+
+    // Save to localStorage so /catalog also gets it
+    try {
+      const saved = localStorage.getItem('smart_pos_menu_items');
+      const existing = saved ? JSON.parse(saved) : [];
+      const forCatalog = {
+        id: newItem.id,
+        name: newItem.name,
+        category: newItem.category,
+        base_price: newItem.price,
+        is_veg: newItem.is_veg,
+        is_available: true,
+        short_code: newItem.short_code,
+        prep_time_minutes: 15,
+      };
+      localStorage.setItem('smart_pos_menu_items', JSON.stringify([forCatalog, ...existing]));
+    } catch {
+      // ignore
+    }
+
+    // Automatically punch into current cart
+    addToCart(newItem);
+    setIsQuickAddModalOpen(false);
+    setKotSentAlert(true);
+    setTimeout(() => setKotSentAlert(false), 3000);
   };
 
   return (
@@ -209,11 +287,27 @@ export default function PosBillingPage() {
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border border-white"></span>
             <span>Veg Only</span>
           </button>
+
+          {/* Quick Add Dish Button */}
+          <button
+            onClick={() => {
+              setQuickDishName('');
+              setQuickDishPrice('');
+              setQuickDishCode('');
+              setQuickDishCat('Biryani');
+              setQuickDishVeg(true);
+              setIsQuickAddModalOpen(true);
+            }}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white transition shadow-sm shrink-0"
+          >
+            <span className="text-base leading-none">＋</span>
+            <span>Add Dish</span>
+          </button>
         </header>
 
         {/* Category Pill Tabs */}
         <div className="bg-white px-6 py-3 border-b border-slate-200 flex gap-2 overflow-x-auto">
-          {['All', 'Biryani', 'Starters', 'Breads', 'Desserts', 'Drinks'].map((cat) => (
+          {allCategories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
@@ -232,36 +326,57 @@ export default function PosBillingPage() {
         <div className="flex-1 p-6 overflow-y-auto">
           {kotSentAlert && (
             <div className="mb-4 p-3 rounded-xl bg-emerald-600 text-white text-xs font-bold flex items-center justify-between shadow-md">
-              <span>✓ Kitchen Order Ticket (KOT #108) fired to Kitchen Display System!</span>
-              <span className="text-emerald-200">Printed 80mm</span>
+              <span>✓ Action updated & Kitchen Order Ticket fired!</span>
+              <span className="text-emerald-200">POS Synchronized</span>
             </div>
           )}
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredItems.map((item) => (
+          {filteredItems.length === 0 ? (
+            <div className="h-64 flex flex-col items-center justify-center text-center p-6 bg-white rounded-2xl border border-dashed border-slate-300">
+              <span className="text-4xl mb-2">🍽️</span>
+              <h4 className="text-sm font-bold text-slate-700">No dishes found matching &quot;{searchQuery}&quot;</h4>
+              <p className="text-xs text-slate-400 mt-1 mb-4">You can quickly add this new dish to the menu now</p>
               <button
-                key={item.id}
-                onClick={() => addToCart(item)}
-                className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-orange-500 hover:shadow-md transition text-left flex flex-col justify-between h-36 group active:scale-[0.98]"
+                onClick={() => {
+                  setQuickDishName(searchQuery);
+                  setQuickDishPrice('');
+                  setQuickDishCode('');
+                  setQuickDishCat('Biryani');
+                  setQuickDishVeg(true);
+                  setIsQuickAddModalOpen(true);
+                }}
+                className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs font-bold shadow-md shadow-orange-600/30 transition"
               >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-mono text-slate-400 group-hover:text-orange-600 font-bold">{item.short_code}</span>
-                    <span className={`w-3 h-3 rounded-sm flex items-center justify-center border ${item.is_veg ? 'border-emerald-600' : 'border-red-600'}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${item.is_veg ? 'bg-emerald-600' : 'bg-red-600'}`}></span>
+                ＋ Add &quot;{searchQuery}&quot; to Menu &amp; Punch
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {filteredItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => addToCart(item)}
+                  className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-orange-500 hover:shadow-md transition text-left flex flex-col justify-between h-36 group active:scale-[0.98]"
+                >
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-mono text-slate-400 group-hover:text-orange-600 font-bold">{item.short_code}</span>
+                      <span className={`w-3 h-3 rounded-sm flex items-center justify-center border ${item.is_veg ? 'border-emerald-600' : 'border-red-600'}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${item.is_veg ? 'bg-emerald-600' : 'bg-red-600'}`}></span>
+                      </span>
+                    </div>
+                    <h4 className="font-bold text-sm text-slate-900 mt-1 line-clamp-2 leading-tight">{item.name}</h4>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-slate-100 pt-2 mt-2">
+                    <span className="text-base font-extrabold text-slate-900">₹{item.price}</span>
+                    <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md group-hover:bg-orange-600 group-hover:text-white transition">
+                      + Add
                     </span>
                   </div>
-                  <h4 className="font-bold text-sm text-slate-900 mt-1 line-clamp-2 leading-tight">{item.name}</h4>
-                </div>
-                <div className="flex items-center justify-between border-t border-slate-100 pt-2 mt-2">
-                  <span className="text-base font-extrabold text-slate-900">₹{item.price}</span>
-                  <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md group-hover:bg-orange-600 group-hover:text-white transition">
-                    + Add
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -555,6 +670,142 @@ export default function PosBillingPage() {
                 Done & Next Order
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Add Dish Modal in POS */}
+      {isQuickAddModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="font-extrabold text-base text-slate-900">Add New Dish to Menu</h3>
+                <p className="text-[11px] text-slate-500">Quickly add an off-menu dish or new specialty</p>
+              </div>
+              <button
+                onClick={() => setIsQuickAddModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 text-lg font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveQuickDish} className="space-y-3.5 mt-4">
+              {/* Dish Name */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Dish Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={quickDishName}
+                  onChange={(e) => {
+                    setQuickDishName(e.target.value);
+                    if (!quickDishCode) {
+                      const initials = e.target.value
+                        .split(' ')
+                        .filter(Boolean)
+                        .map((w) => w[0].toUpperCase())
+                        .join('');
+                      if (initials) setQuickDishCode(`${initials}01`);
+                    }
+                  }}
+                  placeholder="e.g. Mutton Rogan Josh"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                />
+              </div>
+
+              {/* Short Code & Price */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Short Code</label>
+                  <input
+                    type="text"
+                    value={quickDishCode}
+                    onChange={(e) => setQuickDishCode(e.target.value.toUpperCase())}
+                    placeholder="e.g. MRJ01"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-mono font-bold focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Base Price (₹) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={quickDishPrice}
+                    onChange={(e) => setQuickDishPrice(Number(e.target.value))}
+                    placeholder="e.g. 320"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                  />
+                </div>
+              </div>
+
+              {/* Category & Dietary */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Category</label>
+                  <select
+                    value={quickDishCat}
+                    onChange={(e) => setQuickDishCat(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-orange-500 focus:bg-white"
+                  >
+                    <option value="Biryani">Biryani</option>
+                    <option value="Starters">Starters</option>
+                    <option value="Breads">Breads</option>
+                    <option value="Main Course">Main Course</option>
+                    <option value="Drinks">Drinks</option>
+                    <option value="Desserts">Desserts</option>
+                    <option value="Fast Food">Fast Food</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Dietary Tag</label>
+                  <div className="grid grid-cols-2 gap-1.5 p-0.5 bg-slate-100 rounded-xl border border-slate-200">
+                    <button
+                      type="button"
+                      onClick={() => setQuickDishVeg(true)}
+                      className={`py-1.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1 ${
+                        quickDishVeg ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600'
+                      }`}
+                    >
+                      <span className="w-2 h-2 rounded-full bg-white"></span>
+                      Veg
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setQuickDishVeg(false)}
+                      className={`py-1.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1 ${
+                        !quickDishVeg ? 'bg-red-600 text-white shadow-xs' : 'text-slate-600'
+                      }`}
+                    >
+                      <span className="w-2 h-2 rounded-full bg-white"></span>
+                      Non-Veg
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsQuickAddModalOpen(false)}
+                  className="flex-1 py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 bg-orange-600 hover:bg-orange-500 text-white rounded-xl text-xs font-bold shadow-md shadow-orange-600/30 transition flex items-center justify-center gap-1"
+                >
+                  <span>+ Save &amp; Add to Cart</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
