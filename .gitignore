@@ -52,6 +52,9 @@ dist/
 supabase/.temp/
 supabase/.branches/
 
+# Netlify
+.netlify/
+
 # Operating System & IDEs
 .DS_Store
 Thumbs.db
