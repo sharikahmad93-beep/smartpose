@@ -14,6 +14,9 @@ export interface MenuItemDisplay {
   short_code: string;
   prep_time_minutes?: number;
   description?: string;
+  portion_value?: number | '';
+  portion_unit?: string;
+  portion_size?: string;
 }
 
 export interface ComboOffer {
@@ -27,18 +30,18 @@ export interface ComboOffer {
 }
 
 const DEFAULT_ITEMS: MenuItemDisplay[] = [
-  { id: '1', name: 'Special Mutton Dum Biryani', category: 'Hyderabadi Dum Biryani', base_price: 380, is_veg: false, is_available: true, short_code: 'MB01', prep_time_minutes: 20 },
-  { id: '2', name: 'Royal Chicken Dum Biryani', category: 'Hyderabadi Dum Biryani', base_price: 290, is_veg: false, is_available: true, short_code: 'CB01', prep_time_minutes: 15 },
-  { id: '3', name: 'Nawabi Paneer Dum Biryani', category: 'Hyderabadi Dum Biryani', base_price: 240, is_veg: true, is_available: true, short_code: 'PB01', prep_time_minutes: 15 },
-  { id: '4', name: 'Chicken 65 (Crispy Andhra Style)', category: 'Tandoori & Starters', base_price: 260, is_veg: false, is_available: true, short_code: 'C65', prep_time_minutes: 12 },
-  { id: '5', name: 'Tandoori Paneer Tikka', category: 'Tandoori & Starters', base_price: 230, is_veg: true, is_available: true, short_code: 'PT01', prep_time_minutes: 15 },
-  { id: '6', name: 'Murgh Malai Kebab', category: 'Tandoori & Starters', base_price: 280, is_veg: false, is_available: false, short_code: 'MMK01', prep_time_minutes: 18 },
-  { id: '7', name: 'Butter Naan', category: 'Indian Breads & Curries', base_price: 50, is_veg: true, is_available: true, short_code: 'BN01', prep_time_minutes: 5 },
-  { id: '8', name: 'Garlic Herb Naan', category: 'Indian Breads & Curries', base_price: 65, is_veg: true, is_available: true, short_code: 'GN01', prep_time_minutes: 6 },
-  { id: '9', name: 'Hot Gulab Jamun (2 Pcs)', category: 'Beverages & Desserts', base_price: 80, is_veg: true, is_available: true, short_code: 'GJ01', prep_time_minutes: 5 },
-  { id: '10', name: 'Irani Masala Chai', category: 'Beverages & Desserts', base_price: 40, is_veg: true, is_available: true, short_code: 'MC01', prep_time_minutes: 5 },
-  { id: '11', name: 'Fresh Lime Soda', category: 'Beverages & Desserts', base_price: 60, is_veg: true, is_available: true, short_code: 'FLS01', prep_time_minutes: 4 },
-  { id: '12', name: 'Tandoori Roti', category: 'Indian Breads & Curries', base_price: 35, is_veg: true, is_available: true, short_code: 'TR01', prep_time_minutes: 5 },
+  { id: '1', name: 'Special Mutton Dum Biryani', category: 'Hyderabadi Dum Biryani', base_price: 380, is_veg: false, is_available: true, short_code: 'MB01', prep_time_minutes: 20, portion_value: 750, portion_unit: 'gm', portion_size: '750 gm' },
+  { id: '2', name: 'Royal Chicken Dum Biryani', category: 'Hyderabadi Dum Biryani', base_price: 290, is_veg: false, is_available: true, short_code: 'CB01', prep_time_minutes: 15, portion_value: 650, portion_unit: 'gm', portion_size: '650 gm' },
+  { id: '3', name: 'Nawabi Paneer Dum Biryani', category: 'Hyderabadi Dum Biryani', base_price: 240, is_veg: true, is_available: true, short_code: 'PB01', prep_time_minutes: 15, portion_value: 500, portion_unit: 'gm', portion_size: '500 gm' },
+  { id: '4', name: 'Chicken 65 (Crispy Andhra Style)', category: 'Tandoori & Starters', base_price: 260, is_veg: false, is_available: true, short_code: 'C65', prep_time_minutes: 12, portion_value: 8, portion_unit: 'pcs', portion_size: '8 Pcs' },
+  { id: '5', name: 'Tandoori Paneer Tikka', category: 'Tandoori & Starters', base_price: 230, is_veg: true, is_available: true, short_code: 'PT01', prep_time_minutes: 15, portion_value: 6, portion_unit: 'pcs', portion_size: '6 Pcs' },
+  { id: '6', name: 'Murgh Malai Kebab', category: 'Tandoori & Starters', base_price: 280, is_veg: false, is_available: false, short_code: 'MMK01', prep_time_minutes: 18, portion_value: 6, portion_unit: 'pcs', portion_size: '6 Pcs' },
+  { id: '7', name: 'Butter Naan', category: 'Indian Breads & Curries', base_price: 50, is_veg: true, is_available: true, short_code: 'BN01', prep_time_minutes: 5, portion_value: 1, portion_unit: 'pcs', portion_size: '1 Pc' },
+  { id: '8', name: 'Garlic Herb Naan', category: 'Indian Breads & Curries', base_price: 65, is_veg: true, is_available: true, short_code: 'GN01', prep_time_minutes: 6, portion_value: 1, portion_unit: 'pcs', portion_size: '1 Pc' },
+  { id: '9', name: 'Hot Gulab Jamun (2 Pcs)', category: 'Beverages & Desserts', base_price: 80, is_veg: true, is_available: true, short_code: 'GJ01', prep_time_minutes: 5, portion_value: 2, portion_unit: 'pcs', portion_size: '2 Pcs' },
+  { id: '10', name: 'Irani Masala Chai', category: 'Beverages & Desserts', base_price: 40, is_veg: true, is_available: true, short_code: 'MC01', prep_time_minutes: 5, portion_value: 150, portion_unit: 'ml', portion_size: '150 ml' },
+  { id: '11', name: 'Fresh Lime Soda', category: 'Beverages & Desserts', base_price: 60, is_veg: true, is_available: true, short_code: 'FLS01', prep_time_minutes: 4, portion_value: 300, portion_unit: 'ml', portion_size: '300 ml' },
+  { id: '12', name: 'Tandoori Roti', category: 'Indian Breads & Curries', base_price: 35, is_veg: true, is_available: true, short_code: 'TR01', prep_time_minutes: 5, portion_value: 1, portion_unit: 'pcs', portion_size: '1 Pc' },
 ];
 
 const DEFAULT_COMBOS: ComboOffer[] = [
@@ -76,6 +79,8 @@ export default function CatalogPage() {
   const [dishCategory, setDishCategory] = useState(CATEGORIES[0]);
   const [customCategory, setCustomCategory] = useState('');
   const [dishPrice, setDishPrice] = useState<number | ''>('');
+  const [dishPortionValue, setDishPortionValue] = useState<number | ''>('');
+  const [dishPortionUnit, setDishPortionUnit] = useState<string>('ml');
   const [dishIsVeg, setDishIsVeg] = useState(true);
   const [dishPrepTime, setDishPrepTime] = useState<number>(15);
   const [dishIsAvailable, setDishIsAvailable] = useState(true);
@@ -152,6 +157,8 @@ export default function CatalogPage() {
     setDishCategory(CATEGORIES[0]);
     setCustomCategory('');
     setDishPrice('');
+    setDishPortionValue('');
+    setDishPortionUnit('ml');
     setDishIsVeg(true);
     setDishPrepTime(15);
     setDishIsAvailable(true);
@@ -171,6 +178,8 @@ export default function CatalogPage() {
       setCustomCategory('');
     }
     setDishPrice(item.base_price);
+    setDishPortionValue(item.portion_value !== undefined ? item.portion_value : '');
+    setDishPortionUnit(item.portion_unit || 'ml');
     setDishIsVeg(item.is_veg);
     setDishPrepTime(item.prep_time_minutes || 15);
     setDishIsAvailable(item.is_available);
@@ -196,6 +205,7 @@ export default function CatalogPage() {
       : dishCategory;
 
     const finalShortCode = dishShortCode.trim() || `D${Date.now().toString().slice(-3)}`;
+    const finalPortionSize = dishPortionValue ? `${dishPortionValue} ${dishPortionUnit}` : undefined;
 
     if (editingItem) {
       // Update existing item
@@ -207,6 +217,9 @@ export default function CatalogPage() {
               short_code: finalShortCode,
               category: finalCategory,
               base_price: finalPrice,
+              portion_value: dishPortionValue,
+              portion_unit: dishPortionUnit,
+              portion_size: finalPortionSize,
               is_veg: dishIsVeg,
               is_available: dishIsAvailable,
               prep_time_minutes: Number(dishPrepTime) || 15,
@@ -224,6 +237,9 @@ export default function CatalogPage() {
         short_code: finalShortCode,
         category: finalCategory,
         base_price: finalPrice,
+        portion_value: dishPortionValue,
+        portion_unit: dishPortionUnit,
+        portion_size: finalPortionSize,
         is_veg: dishIsVeg,
         is_available: dishIsAvailable,
         prep_time_minutes: Number(dishPrepTime) || 15,
@@ -437,6 +453,7 @@ export default function CatalogPage() {
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                     <th className="py-3.5 px-6 whitespace-nowrap">Dish Name &amp; Code</th>
+                    <th className="py-3.5 px-6 whitespace-nowrap">Quantity (ml / gm / pcs)</th>
                     <th className="py-3.5 px-6 whitespace-nowrap">Category</th>
                     <th className="py-3.5 px-6 whitespace-nowrap">Dietary</th>
                     <th className="py-3.5 px-6 whitespace-nowrap">Price</th>
@@ -447,7 +464,7 @@ export default function CatalogPage() {
                 <tbody className="divide-y divide-slate-100 text-sm">
                   {filteredItems.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-12 text-center text-slate-400">
+                      <td colSpan={7} className="py-12 text-center text-slate-400">
                         <div className="text-3xl mb-2">🍽️</div>
                         <p className="font-bold text-slate-700">No dishes found matching &quot;{search}&quot;</p>
                         <button
@@ -471,6 +488,16 @@ export default function CatalogPage() {
                               </span>
                             )}
                           </div>
+                        </td>
+                        <td className="py-4 px-6 whitespace-nowrap">
+                          {item.portion_size ? (
+                            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
+                              <span>📏</span>
+                              <span>{item.portion_size}</span>
+                            </span>
+                          ) : (
+                            <span className="text-xs text-slate-400 italic">—</span>
+                          )}
                         </td>
                         <td className="py-4 px-6 text-xs text-slate-600 font-medium whitespace-nowrap">
                           {item.category}
@@ -662,6 +689,92 @@ export default function CatalogPage() {
                       onChange={(e) => setDishPrice(e.target.value === '' ? '' : Number(e.target.value))}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold font-mono focus:ring-2 focus:ring-orange-500 focus:bg-white text-slate-900"
                     />
+                  </div>
+                </div>
+
+                {/* Serving Quantity / Measurement Unit (ml, gm, pcs, plate) */}
+                <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <label className="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                      <span className="text-sm">📏</span>
+                      <span>Portion Quantity &amp; Unit (ml / gm / pcs)</span>
+                      <span className="text-slate-400 font-normal text-[10px]">(Optional)</span>
+                    </label>
+                    <span className="text-[10px] text-orange-600 font-bold">
+                      {dishPortionValue ? `Selected: ${dishPortionValue} ${dishPortionUnit}` : 'e.g. 250 ml, 500 gm'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[11px] font-semibold text-slate-600 block mb-1">Quantity / Amount</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        placeholder="e.g. 250, 500, 1"
+                        value={dishPortionValue}
+                        onChange={(e) => setDishPortionValue(e.target.value === '' ? '' : Number(e.target.value))}
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-orange-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-semibold text-slate-600 block mb-1">Serving Unit</label>
+                      <select
+                        value={dishPortionUnit}
+                        onChange={(e) => setDishPortionUnit(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-orange-500"
+                      >
+                        <option value="ml">ml (Milliliters - Drinks/Soups)</option>
+                        <option value="L">L (Litres - Bulk/Beverages)</option>
+                        <option value="gm">gm (Grams - Biryani/Curry)</option>
+                        <option value="kg">kg (Kilograms - Handi/Combos)</option>
+                        <option value="pcs">Pcs (Pieces - Kebabs/Rotis)</option>
+                        <option value="Plate">Plate (Full / Single)</option>
+                        <option value="Half">Half Plate</option>
+                        <option value="Glass">Glass</option>
+                        <option value="Cup">Cup</option>
+                        <option value="Bottle">Bottle / Can</option>
+                        <option value="Portion">Portion</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* 1-Click Quick Presets */}
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <span className="text-[10px] text-slate-500 font-bold">Quick Units:</span>
+                    {[
+                      { val: 250, unit: 'ml', label: '250 ml' },
+                      { val: 500, unit: 'ml', label: '500 ml' },
+                      { val: 750, unit: 'ml', label: '750 ml' },
+                      { val: 1000, unit: 'ml', label: '1 Litre' },
+                      { val: 250, unit: 'gm', label: '250 gm' },
+                      { val: 500, unit: 'gm', label: '500 gm' },
+                      { val: 750, unit: 'gm', label: '750 gm' },
+                      { val: 1, unit: 'kg', label: '1 kg' },
+                      { val: 2, unit: 'pcs', label: '2 Pcs' },
+                      { val: 4, unit: 'pcs', label: '4 Pcs' },
+                      { val: 8, unit: 'pcs', label: '8 Pcs' },
+                      { val: 1, unit: 'Plate', label: '1 Plate' },
+                      { val: 1, unit: 'Half', label: 'Half Plate' },
+                    ].map((preset) => (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => {
+                          setDishPortionValue(preset.val);
+                          setDishPortionUnit(preset.unit);
+                        }}
+                        className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition ${
+                          dishPortionValue === preset.val && dishPortionUnit === preset.unit
+                            ? 'bg-orange-600 text-white border-orange-600 shadow-xs'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
 

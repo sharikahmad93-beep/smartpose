@@ -10,6 +10,9 @@ interface MenuItem {
   category: string;
   price: number;
   is_veg: boolean;
+  portion_size?: string;
+  portion_value?: number | '';
+  portion_unit?: string;
 }
 
 interface CartItem extends MenuItem {
@@ -19,18 +22,18 @@ interface CartItem extends MenuItem {
 }
 
 const CATALOG_ITEMS: MenuItem[] = [
-  { id: '1', name: 'Special Mutton Dum Biryani', short_code: 'MB01', category: 'Biryani', price: 380, is_veg: false },
-  { id: '2', name: 'Royal Chicken Dum Biryani', short_code: 'CB01', category: 'Biryani', price: 290, is_veg: false },
-  { id: '3', name: 'Nawabi Paneer Dum Biryani', short_code: 'PB01', category: 'Biryani', price: 240, is_veg: true },
-  { id: '4', name: 'Chicken 65 (Crispy Andhra)', short_code: 'C65', category: 'Starters', price: 260, is_veg: false },
-  { id: '5', name: 'Tandoori Paneer Tikka', short_code: 'PT01', category: 'Starters', price: 230, is_veg: true },
-  { id: '6', name: 'Murgh Malai Kebab', short_code: 'MMK01', category: 'Starters', price: 280, is_veg: false },
-  { id: '7', name: 'Butter Naan', short_code: 'BN01', category: 'Breads', price: 50, is_veg: true },
-  { id: '8', name: 'Garlic Herb Naan', short_code: 'GN01', category: 'Breads', price: 65, is_veg: true },
-  { id: '9', name: 'Tandoori Roti', short_code: 'TR01', category: 'Breads', price: 35, is_veg: true },
-  { id: '10', name: 'Hot Gulab Jamun (2 Pcs)', short_code: 'GJ01', category: 'Desserts', price: 80, is_veg: true },
-  { id: '11', name: 'Irani Masala Chai', short_code: 'MC01', category: 'Drinks', price: 40, is_veg: true },
-  { id: '12', name: 'Fresh Lime Soda', short_code: 'FLS01', category: 'Drinks', price: 60, is_veg: true },
+  { id: '1', name: 'Special Mutton Dum Biryani', short_code: 'MB01', category: 'Biryani', price: 380, is_veg: false, portion_size: '750 gm', portion_value: 750, portion_unit: 'gm' },
+  { id: '2', name: 'Royal Chicken Dum Biryani', short_code: 'CB01', category: 'Biryani', price: 290, is_veg: false, portion_size: '650 gm', portion_value: 650, portion_unit: 'gm' },
+  { id: '3', name: 'Nawabi Paneer Dum Biryani', short_code: 'PB01', category: 'Biryani', price: 240, is_veg: true, portion_size: '500 gm', portion_value: 500, portion_unit: 'gm' },
+  { id: '4', name: 'Chicken 65 (Crispy Andhra)', short_code: 'C65', category: 'Starters', price: 260, is_veg: false, portion_size: '8 Pcs', portion_value: 8, portion_unit: 'pcs' },
+  { id: '5', name: 'Tandoori Paneer Tikka', short_code: 'PT01', category: 'Starters', price: 230, is_veg: true, portion_size: '6 Pcs', portion_value: 6, portion_unit: 'pcs' },
+  { id: '6', name: 'Murgh Malai Kebab', short_code: 'MMK01', category: 'Starters', price: 280, is_veg: false, portion_size: '6 Pcs', portion_value: 6, portion_unit: 'pcs' },
+  { id: '7', name: 'Butter Naan', short_code: 'BN01', category: 'Breads', price: 50, is_veg: true, portion_size: '1 Pc', portion_value: 1, portion_unit: 'pcs' },
+  { id: '8', name: 'Garlic Herb Naan', short_code: 'GN01', category: 'Breads', price: 65, is_veg: true, portion_size: '1 Pc', portion_value: 1, portion_unit: 'pcs' },
+  { id: '9', name: 'Tandoori Roti', short_code: 'TR01', category: 'Breads', price: 35, is_veg: true, portion_size: '1 Pc', portion_value: 1, portion_unit: 'pcs' },
+  { id: '10', name: 'Hot Gulab Jamun (2 Pcs)', short_code: 'GJ01', category: 'Desserts', price: 80, is_veg: true, portion_size: '2 Pcs', portion_value: 2, portion_unit: 'pcs' },
+  { id: '11', name: 'Irani Masala Chai', short_code: 'MC01', category: 'Drinks', price: 40, is_veg: true, portion_size: '150 ml', portion_value: 150, portion_unit: 'ml' },
+  { id: '12', name: 'Fresh Lime Soda', short_code: 'FLS01', category: 'Drinks', price: 60, is_veg: true, portion_size: '300 ml', portion_value: 300, portion_unit: 'ml' },
 ];
 
 const TABLES = ['T-01', 'T-02', 'T-03', 'T-04', 'T-05', 'T-06', 'T-07', 'T-08', 'T-09', 'T-10'];
@@ -43,9 +46,9 @@ export default function PosBillingPage() {
   const [selectedTable, setSelectedTable] = useState<string>('T-01');
   const [orderType, setOrderType] = useState<'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'>('DINE_IN');
   const [cart, setCart] = useState<CartItem[]>([
-    { id: '1', name: 'Special Mutton Dum Biryani', short_code: 'MB01', category: 'Biryani', price: 380, is_veg: false, quantity: 2, portion: 'Regular' },
-    { id: '4', name: 'Chicken 65 (Crispy Andhra)', short_code: 'C65', category: 'Starters', price: 260, is_veg: false, quantity: 1, portion: 'Regular' },
-    { id: '7', name: 'Butter Naan', short_code: 'BN01', category: 'Breads', price: 50, is_veg: true, quantity: 3, portion: 'Regular' }
+    { id: '1', name: 'Special Mutton Dum Biryani', short_code: 'MB01', category: 'Biryani', price: 380, is_veg: false, quantity: 2, portion: 'Regular', portion_size: '750 gm' },
+    { id: '4', name: 'Chicken 65 (Crispy Andhra)', short_code: 'C65', category: 'Starters', price: 260, is_veg: false, quantity: 1, portion: 'Regular', portion_size: '8 Pcs' },
+    { id: '7', name: 'Butter Naan', short_code: 'BN01', category: 'Breads', price: 50, is_veg: true, quantity: 3, portion: 'Regular', portion_size: '1 Pc' }
   ]);
   const [discountPercent, setDiscountPercent] = useState<number>(0);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false);
@@ -58,6 +61,8 @@ export default function PosBillingPage() {
   const [isQuickAddModalOpen, setIsQuickAddModalOpen] = useState(false);
   const [quickDishName, setQuickDishName] = useState('');
   const [quickDishPrice, setQuickDishPrice] = useState<number | ''>('');
+  const [quickDishPortionVal, setQuickDishPortionVal] = useState<number | ''>('');
+  const [quickDishPortionUnit, setQuickDishPortionUnit] = useState('ml');
   const [quickDishCat, setQuickDishCat] = useState('Biryani');
   const [quickDishVeg, setQuickDishVeg] = useState(true);
   const [quickDishCode, setQuickDishCode] = useState('');
@@ -76,6 +81,9 @@ export default function PosBillingPage() {
             category: p.category.includes('Biryani') ? 'Biryani' : p.category.includes('Starter') ? 'Starters' : p.category.includes('Bread') ? 'Breads' : p.category.includes('Beverage') ? 'Drinks' : p.category,
             price: Number(p.base_price || p.price),
             is_veg: Boolean(p.is_veg),
+            portion_size: p.portion_size,
+            portion_value: p.portion_value,
+            portion_unit: p.portion_unit,
           }));
           setCatalogItems(mapped);
         }
@@ -143,6 +151,8 @@ export default function PosBillingPage() {
     e.preventDefault();
     if (!quickDishName.trim() || !quickDishPrice) return;
 
+    const finalPortion = quickDishPortionVal ? `${quickDishPortionVal} ${quickDishPortionUnit}` : undefined;
+
     const newItem: MenuItem = {
       id: `dish-${Date.now()}`,
       name: quickDishName.trim(),
@@ -150,6 +160,9 @@ export default function PosBillingPage() {
       category: quickDishCat,
       price: Number(quickDishPrice),
       is_veg: quickDishVeg,
+      portion_size: finalPortion,
+      portion_value: quickDishPortionVal,
+      portion_unit: quickDishPortionUnit,
     };
 
     const updated = [newItem, ...catalogItems];
@@ -168,6 +181,9 @@ export default function PosBillingPage() {
         is_available: true,
         short_code: newItem.short_code,
         prep_time_minutes: 15,
+        portion_size: newItem.portion_size,
+        portion_value: newItem.portion_value,
+        portion_unit: newItem.portion_unit,
       };
       localStorage.setItem('smart_pos_menu_items', JSON.stringify([forCatalog, ...existing]));
     } catch {
@@ -293,6 +309,8 @@ export default function PosBillingPage() {
             onClick={() => {
               setQuickDishName('');
               setQuickDishPrice('');
+              setQuickDishPortionVal('');
+              setQuickDishPortionUnit('ml');
               setQuickDishCode('');
               setQuickDishCat('Biryani');
               setQuickDishVeg(true);
@@ -340,6 +358,8 @@ export default function PosBillingPage() {
                 onClick={() => {
                   setQuickDishName(searchQuery);
                   setQuickDishPrice('');
+                  setQuickDishPortionVal('');
+                  setQuickDishPortionUnit('ml');
                   setQuickDishCode('');
                   setQuickDishCat('Biryani');
                   setQuickDishVeg(true);
@@ -361,9 +381,16 @@ export default function PosBillingPage() {
                   <div>
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] font-mono text-slate-400 group-hover:text-orange-600 font-bold">{item.short_code}</span>
-                      <span className={`w-3 h-3 rounded-sm flex items-center justify-center border ${item.is_veg ? 'border-emerald-600' : 'border-red-600'}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${item.is_veg ? 'bg-emerald-600' : 'bg-red-600'}`}></span>
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        {item.portion_size && (
+                          <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                            {item.portion_size}
+                          </span>
+                        )}
+                        <span className={`w-3 h-3 rounded-sm flex items-center justify-center border ${item.is_veg ? 'border-emerald-600' : 'border-red-600'}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${item.is_veg ? 'bg-emerald-600' : 'bg-red-600'}`}></span>
+                        </span>
+                      </div>
                     </div>
                     <h4 className="font-bold text-sm text-slate-900 mt-1 line-clamp-2 leading-tight">{item.name}</h4>
                   </div>
@@ -742,6 +769,74 @@ export default function PosBillingPage() {
                     placeholder="e.g. 320"
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-orange-500 focus:bg-white"
                   />
+                </div>
+              </div>
+
+              {/* Quantity / Serving Size (ml, gm, pcs, plate) */}
+              <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
+                <div className="flex items-center justify-between text-[11px] font-bold text-slate-700">
+                  <span className="flex items-center gap-1">
+                    <span>📏</span>
+                    <span>Quantity / Unit (ml / gm / pcs)</span>
+                  </span>
+                  <span className="text-[10px] text-orange-600 font-extrabold">
+                    {quickDishPortionVal ? `${quickDishPortionVal} ${quickDishPortionUnit}` : 'Optional'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    placeholder="e.g. 250, 500, 1"
+                    value={quickDishPortionVal}
+                    onChange={(e) => setQuickDishPortionVal(e.target.value === '' ? '' : Number(e.target.value))}
+                    className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-orange-500"
+                  />
+                  <select
+                    value={quickDishPortionUnit}
+                    onChange={(e) => setQuickDishPortionUnit(e.target.value)}
+                    className="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-800 focus:ring-2 focus:ring-orange-500"
+                  >
+                    <option value="ml">ml (Milliliters)</option>
+                    <option value="L">L (Litres)</option>
+                    <option value="gm">gm (Grams)</option>
+                    <option value="kg">kg (Kilograms)</option>
+                    <option value="pcs">Pcs (Pieces)</option>
+                    <option value="Plate">Plate (Full)</option>
+                    <option value="Half">Half Plate</option>
+                    <option value="Glass">Glass</option>
+                    <option value="Cup">Cup</option>
+                    <option value="Bottle">Bottle</option>
+                  </select>
+                </div>
+                {/* 1-click Quick Unit Presets */}
+                <div className="flex flex-wrap gap-1 pt-0.5">
+                  {[
+                    { val: 250, unit: 'ml', label: '250 ml' },
+                    { val: 500, unit: 'ml', label: '500 ml' },
+                    { val: 250, unit: 'gm', label: '250 gm' },
+                    { val: 500, unit: 'gm', label: '500 gm' },
+                    { val: 2, unit: 'pcs', label: '2 Pcs' },
+                    { val: 1, unit: 'Plate', label: '1 Plate' },
+                    { val: 1, unit: 'Half', label: 'Half' },
+                  ].map((p) => (
+                    <button
+                      key={p.label}
+                      type="button"
+                      onClick={() => {
+                        setQuickDishPortionVal(p.val);
+                        setQuickDishPortionUnit(p.unit);
+                      }}
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-bold border transition ${
+                        quickDishPortionVal === p.val && quickDishPortionUnit === p.unit
+                          ? 'bg-orange-600 text-white border-orange-600 shadow-xs'
+                          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
