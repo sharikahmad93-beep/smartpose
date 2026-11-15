@@ -37,16 +37,15 @@ flowchart TD
 
 ---
 
-### Step 2: Supabase Cloud Project Setup (Next Immediate Step)
-* **Actions:**
-  1. Login to Supabase Cloud web console.
-  2. Create Organization: `SmartRestaurantPOS`.
-  3. Create Project: `smart-restaurant-pos-dev` in region **Mumbai (`ap-south-1`)**.
-  4. Collect secure public configuration:
-     * `NEXT_PUBLIC_SUPABASE_URL`
-     * `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-  5. Store keys in `.env.example` and local `.env.local` (strictly protected by `.gitignore`).
-* **Acceptance Criteria:** `curl -I https://<project-ref>.supabase.co/rest/v1/` returns `200` or `401 Unauthorized` (confirming active API gateway).
+### Step 2: Supabase Cloud Project Setup & Environment Configuration ✅
+* **Status:** Configured & Documented (`.env.example`, `.env.local`, `docs/environment-configuration.md`).
+* **Cloud Region:** South Asia (Mumbai), AWS `ap-south-1`.
+* **Actions Completed:**
+  1. Region confirmed: South Asia (Mumbai) — AWS `ap-south-1`.
+  2. Created safe `.env.example` template with canonical and client alias placeholders.
+  3. Created local Git-ignored `.env.local` override file.
+  4. Documented security classification in `docs/environment-configuration.md` (publishable vs. secret service-role key rules).
+* **Next Action:** SQL migration scripts execution (Step 3).
 
 ---
 

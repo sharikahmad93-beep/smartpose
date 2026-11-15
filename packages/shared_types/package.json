@@ -1,0 +1,13 @@
+{
+  "name": "@smart-restaurant-pos/shared-types",
+  "version": "1.0.0",
+  "description": "Shared TypeScript DTOs, domain models, and Supabase database interfaces",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": ["pos", "restaurant", "typescript", "supabase"],
+  "author": "Smart Restaurant POS Engineering Team",
+  "license": "UNLICENSED"
+}
