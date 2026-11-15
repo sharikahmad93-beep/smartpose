@@ -66,7 +66,7 @@ export default function SuperAdminDashboard() {
     <div className="flex min-h-screen bg-slate-950 text-slate-100">
       <SuperSidebar activeTab="dashboard" />
 
-      <main className="flex-1 p-8 overflow-y-auto">
+      <main className="flex-1 p-8 overflow-y-auto pb-24">
         {/* Top Header */}
         <header className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-slate-800 gap-4">
           <div>
@@ -181,33 +181,33 @@ export default function SuperAdminDashboard() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full text-left text-xs min-w-[850px]">
               <thead className="bg-slate-800/60 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
                 <tr>
-                  <th className="px-6 py-4">Brand / Chain Name</th>
-                  <th className="px-6 py-4">Owner &amp; Contact</th>
-                  <th className="px-6 py-4">Active Outlets</th>
-                  <th className="px-6 py-4">Plan Tier</th>
-                  <th className="px-6 py-4">MRR Contribution</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Brand / Chain Name</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Owner &amp; Contact</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Active Outlets</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Plan Tier</th>
+                  <th className="px-6 py-4 whitespace-nowrap">MRR Contribution</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Status</th>
+                  <th className="px-6 py-4 text-right whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
                 {tenants.map((t) => (
                   <tr key={t.id} className="hover:bg-slate-800/40 transition">
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="font-bold text-sm text-white">{t.name}</div>
                       <span className="text-[11px] text-slate-500 font-mono">ID: {t.id} • Joined: {t.joinedDate}</span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="font-semibold text-slate-200">{t.ownerName}</div>
                       <span className="text-[11px] text-slate-400 font-mono">{t.phone}</span>
                     </td>
-                    <td className="px-6 py-4 font-mono font-bold text-sm text-slate-200">
+                    <td className="px-6 py-4 font-mono font-bold text-sm text-slate-200 whitespace-nowrap">
                       {t.outletsCount} Outlets
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2.5 py-1 rounded-lg text-[10px] font-bold ${
                           t.plan === 'Enterprise'
@@ -220,10 +220,10 @@ export default function SuperAdminDashboard() {
                         {t.plan}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-mono font-bold text-white">
+                    <td className="px-6 py-4 font-mono font-bold text-white whitespace-nowrap">
                       ₹{t.mrrAmount.toLocaleString('en-IN')}/mo
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
                           t.status === 'ACTIVE'
@@ -236,14 +236,15 @@ export default function SuperAdminDashboard() {
                         {t.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right whitespace-nowrap">
                       <a
-                        href="http://localhost:3000/"
+                        href="https://smart-restaurant-pos-admin.netlify.app"
                         target="_blank"
                         rel="noreferrer"
-                        className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-orange-400 text-xs font-bold rounded-lg border border-slate-700 transition"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-orange-400 text-xs font-bold rounded-lg border border-slate-700 transition whitespace-nowrap leading-none shadow-sm"
                       >
-                        Impersonate Tenant &rarr;
+                        <span>Impersonate Tenant</span>
+                        <span className="text-sm">&rarr;</span>
                       </a>
                     </td>
                   </tr>

@@ -39,30 +39,30 @@ export default function AuditLogsPage() {
           </div>
         </header>
 
-        <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-xl overflow-hidden my-6">
-          <table className="w-full text-left text-xs">
+        <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-xl overflow-x-auto my-6">
+          <table className="w-full text-left text-xs min-w-[850px]">
             <thead className="bg-slate-800/60 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
               <tr>
-                <th className="px-6 py-4">Timestamp</th>
-                <th className="px-6 py-4">Tenant / Brand</th>
-                <th className="px-6 py-4">User Identity</th>
-                <th className="px-6 py-4">Action Event</th>
-                <th className="px-6 py-4">Device &amp; IP</th>
-                <th className="px-6 py-4 text-right">Security Status</th>
+                <th className="px-6 py-4 whitespace-nowrap">Timestamp</th>
+                <th className="px-6 py-4 whitespace-nowrap">Tenant / Brand</th>
+                <th className="px-6 py-4 whitespace-nowrap">User Identity</th>
+                <th className="px-6 py-4 whitespace-nowrap">Action Event</th>
+                <th className="px-6 py-4 whitespace-nowrap">Device &amp; IP</th>
+                <th className="px-6 py-4 text-right whitespace-nowrap">Security Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
               {logs.map((log) => (
                 <tr key={log.id} className="hover:bg-slate-800/40 transition">
-                  <td className="px-6 py-4 font-mono text-slate-400">{log.timestamp}</td>
-                  <td className="px-6 py-4 font-bold text-white">{log.tenantName}</td>
-                  <td className="px-6 py-4 font-mono text-slate-300">{log.userEmail}</td>
-                  <td className="px-6 py-4 text-slate-200">{log.action}</td>
-                  <td className="px-6 py-4 text-slate-400">
+                  <td className="px-6 py-4 font-mono text-slate-400 whitespace-nowrap">{log.timestamp}</td>
+                  <td className="px-6 py-4 font-bold text-white whitespace-nowrap">{log.tenantName}</td>
+                  <td className="px-6 py-4 font-mono text-slate-300 whitespace-nowrap">{log.userEmail}</td>
+                  <td className="px-6 py-4 text-slate-200 whitespace-nowrap">{log.action}</td>
+                  <td className="px-6 py-4 text-slate-400 whitespace-nowrap">
                     <div>{log.device}</div>
                     <span className="font-mono text-[10px] text-slate-500">{log.ipAddress}</span>
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 text-right whitespace-nowrap">
                     <span
                       className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
                         log.status === 'SUCCESS'

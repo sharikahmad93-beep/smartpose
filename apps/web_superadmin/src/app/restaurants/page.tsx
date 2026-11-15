@@ -56,52 +56,53 @@ export default function RestaurantsListPage() {
           </div>
         </header>
 
-        <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-xl overflow-hidden my-6">
-          <table className="w-full text-left text-xs">
+        <div className="bg-slate-900 rounded-3xl border border-slate-800 shadow-xl overflow-x-auto my-6">
+          <table className="w-full text-left text-xs min-w-[850px]">
             <thead className="bg-slate-800/60 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
               <tr>
-                <th className="px-6 py-4">Restaurant Brand</th>
-                <th className="px-6 py-4">City</th>
-                <th className="px-6 py-4">Outlets &amp; Tables</th>
-                <th className="px-6 py-4">Owner Contact</th>
-                <th className="px-6 py-4">Plan Tier</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Actions</th>
+                <th className="px-6 py-4 whitespace-nowrap">Restaurant Brand</th>
+                <th className="px-6 py-4 whitespace-nowrap">City</th>
+                <th className="px-6 py-4 whitespace-nowrap">Outlets &amp; Tables</th>
+                <th className="px-6 py-4 whitespace-nowrap">Owner Contact</th>
+                <th className="px-6 py-4 whitespace-nowrap">Plan Tier</th>
+                <th className="px-6 py-4 whitespace-nowrap">Status</th>
+                <th className="px-6 py-4 text-right whitespace-nowrap">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
               {filtered.map((r) => (
                 <tr key={r.id} className="hover:bg-slate-800/40 transition">
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="font-bold text-sm text-white">{r.name}</div>
                     <span className="text-[11px] text-slate-500 font-mono">{r.id}</span>
                   </td>
-                  <td className="px-6 py-4 text-slate-300 font-medium">{r.primaryCity}</td>
-                  <td className="px-6 py-4 font-mono font-bold text-slate-200">
+                  <td className="px-6 py-4 text-slate-300 font-medium whitespace-nowrap">{r.primaryCity}</td>
+                  <td className="px-6 py-4 font-mono font-bold text-slate-200 whitespace-nowrap">
                     {r.outlets} Outlets • {r.tablesTotal} Tables
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="font-semibold text-slate-200">{r.owner}</div>
                     <span className="text-[11px] text-slate-400 font-mono">{r.contact}</span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30">
                       {r.plan}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                       {r.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 text-right whitespace-nowrap">
                     <a
-                      href="http://localhost:3000/"
+                      href="https://smart-restaurant-pos-admin.netlify.app"
                       target="_blank"
                       rel="noreferrer"
-                      className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-orange-400 text-xs font-bold rounded-lg border border-slate-700 transition"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-orange-400 text-xs font-bold rounded-lg border border-slate-700 transition whitespace-nowrap leading-none shadow-sm"
                     >
-                      Login to POS &rarr;
+                      <span>Login to POS</span>
+                      <span className="text-sm">&rarr;</span>
                     </a>
                   </td>
                 </tr>
