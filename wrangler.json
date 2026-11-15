@@ -1,0 +1,9 @@
+{
+  "name": "smartpose",
+  "compatibility_date": "2024-11-01",
+  "assets": {
+    "directory": "./apps/web_admin/out",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "single-page-application"
+  }
+}
