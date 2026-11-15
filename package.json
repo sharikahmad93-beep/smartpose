@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "build": "cd apps/web_admin && npm install && npm run build",
-    "deploy": "cd apps/web_admin && npm install && npm run build && cd ../.. && npx wrangler deploy"
+    "deploy": "cd apps/web_admin && npm install && npm run build && cd ../.. && npx wrangler deploy",
+    "build:superadmin": "cd apps/web_superadmin && npm install && npm run build",
+    "deploy:superadmin": "cd apps/web_superadmin && npm install && npm run build && npx wrangler deploy"
   }
 }

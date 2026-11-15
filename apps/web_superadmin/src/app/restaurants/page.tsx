@@ -96,7 +96,7 @@ export default function RestaurantsListPage() {
                   </td>
                   <td className="px-6 py-4 text-right whitespace-nowrap">
                     <a
-                      href="https://smart-restaurant-pos-admin.netlify.app"
+                      href="https://smartpose.sharikahmad93.workers.dev"
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-orange-400 text-xs font-bold rounded-lg border border-slate-700 transition whitespace-nowrap leading-none shadow-sm"
