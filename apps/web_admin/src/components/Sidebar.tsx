@@ -299,7 +299,7 @@ export default function Sidebar({ activeTab = 'overview' }: SidebarProps) {
       {/* Sidebar Footer: Super Admin Link & System Health */}
       <div className="mt-3 pt-3 border-t border-slate-800 space-y-2 text-xs shrink-0">
         <a
-          href="https://smartpose-superadmin.sharikahmad93.workers.dev"
+          href="https://smartpose2.sharikahmad93.workers.dev"
           target="_blank"
           rel="noreferrer"
           className={`w-full flex items-center justify-center gap-1.5 py-2 px-2.5 bg-slate-800/80 hover:bg-slate-700 text-amber-400 rounded-xl text-xs font-bold border border-slate-700 transition ${isCollapsed ? 'p-2' : ''
