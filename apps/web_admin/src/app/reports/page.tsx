@@ -1,18 +1,48 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import TopBar from '@/components/TopBar';
+import { createClient } from '@/lib/supabase/client';
 
 export default function ReportsAndAnalyticsPage() {
   const [dateRange, setDateRange] = useState<'TODAY' | 'YESTERDAY' | 'LAST_7_DAYS' | 'THIS_MONTH'>('TODAY');
   const [outletFilter, setOutletFilter] = useState<'ALL' | 'INDIRANAGAR' | 'WHITEFIELD'>('ALL');
 
-  const grossSales = 48250;
-  const discounts = 2298;
-  const taxableValue = 45952;
-  const cgst = 1149;
-  const sgst = 1149;
+  const [grossSales, setGrossSales] = useState(48250);
+  const [discounts, setDiscounts] = useState(2298);
+  const [taxableValue, setTaxableValue] = useState(45952);
+  const [cgst, setCgst] = useState(1149);
+  const [sgst, setSgst] = useState(1149);
+  const [totalOrders, setTotalOrders] = useState(112);
+
+  useEffect(() => {
+    async function loadRealReportData() {
+      try {
+        const supabase = createClient();
+        const { data: dbOrders } = await supabase
+          .from('orders')
+          .select('subtotal, discount, tax, total, status')
+          .eq('status', 'SETTLED');
+
+        if (dbOrders && dbOrders.length > 0) {
+          const subtotalSum = dbOrders.reduce((sum, o) => sum + (Number(o.subtotal) || 0), 0);
+          const discountSum = dbOrders.reduce((sum, o) => sum + (Number(o.discount) || 0), 0);
+          const taxSum = dbOrders.reduce((sum, o) => sum + (Number(o.tax) || 0), 0);
+
+          setGrossSales(Math.round(subtotalSum));
+          setDiscounts(Math.round(discountSum));
+          setTaxableValue(Math.max(0, Math.round(subtotalSum - discountSum)));
+          setCgst(Math.round((taxSum / 2) * 100) / 100);
+          setSgst(Math.round((taxSum / 2) * 100) / 100);
+          setTotalOrders(dbOrders.length);
+        }
+      } catch (e) {
+        console.warn('Realtime report query fallback');
+      }
+    }
+    loadRealReportData();
+  }, [dateRange]);
   const netSales = taxableValue + cgst + sgst;
   const totalOrders = 112;
   const aov = Math.round(netSales / totalOrders);

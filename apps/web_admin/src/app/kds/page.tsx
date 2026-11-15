@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { ordersService } from '@/lib/ordersService';
 
 interface KotItem {
   id: string;
@@ -133,24 +134,68 @@ export default function KitchenDisplaySystemPage() {
   const [isStockModalOpen, setIsStockModalOpen] = useState<boolean>(false);
   const [stockOutList, setStockOutList] = useState<string[]>(['Irani Masala Chai']);
 
-  // Timer simulation
+  // Timer simulation and Supabase Realtime synchronization
   useEffect(() => {
+    async function loadLiveKots() {
+      try {
+        const liveKots = await ordersService.fetchKDSQueue();
+        if (liveKots && liveKots.length > 0) {
+          const mapped: KotTicket[] = liveKots.map((k: any) => ({
+            id: k.id,
+            kotNumber: k.sequence_number || 101,
+            orderSource: k.orders?.order_type || 'DINE_IN',
+            brandName: 'Biryani Express',
+            sourceReference: k.orders?.dining_tables?.table_number ? `Table ${k.orders.dining_tables.table_number}` : 'Counter Bill',
+            elapsedMinutes: Math.floor((Date.now() - new Date(k.fired_at || k.created_at).getTime()) / 60000) || 1,
+            createdAt: new Date(k.fired_at || k.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+            specialInstructions: 'Live Kitchen Ticket',
+            status: k.status === 'FIRED' ? 'NEW' : (k.status === 'PREPARING' ? 'COOKING' : 'READY'),
+            items: Array.isArray(k.items_snapshot) ? k.items_snapshot.map((it: any, idx: number) => ({
+              id: it.item_id || `it-${idx}`,
+              name: it.name,
+              quantity: it.qty,
+              notes: it.notes,
+              station: (k.station || 'Biryani') as KotItem['station'],
+              status: (k.status === 'FIRED' ? 'PENDING' : 'COOKING') as KotItem['status'],
+            })) : [],
+          }));
+          setTickets((prev) => [...mapped, ...prev.filter(p => !mapped.some(m => m.id === p.id))]);
+        }
+      } catch (e) {
+        console.warn('Live KOT fetch failed, keeping local fallback', e);
+      }
+    }
+    loadLiveKots();
+
+    const unsubscribe = ordersService.subscribeToKDS(() => {
+      loadLiveKots();
+    });
+
     const interval = setInterval(() => {
       setTickets((prev) =>
         prev.map((t) => ({ ...t, elapsedMinutes: t.elapsedMinutes + 1 }))
       );
     }, 60000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
   }, []);
 
   const advanceTicketStatus = (ticketId: string) => {
     setTickets((prev) =>
       prev.map((t) => {
         if (t.id !== ticketId) return t;
-        if (t.status === 'NEW') return { ...t, status: 'COOKING' };
-        if (t.status === 'COOKING') return { ...t, status: 'READY' };
-        if (t.status === 'READY') return { ...t, status: 'BUMPED' };
-        return t;
+        let nextStatus: 'NEW' | 'COOKING' | 'READY' | 'BUMPED' = t.status;
+        let rpcStatus = 'PREPARING';
+        if (t.status === 'NEW') { nextStatus = 'COOKING'; rpcStatus = 'PREPARING'; }
+        else if (t.status === 'COOKING') { nextStatus = 'READY'; rpcStatus = 'READY'; }
+        else if (t.status === 'READY') { nextStatus = 'BUMPED'; rpcStatus = 'SERVED'; }
+
+        if (ticketId.length > 20) {
+          ordersService.updateKOTStatus(ticketId, rpcStatus, 'KITCHEN').catch(console.error);
+        }
+        return { ...t, status: nextStatus };
       })
     );
   };

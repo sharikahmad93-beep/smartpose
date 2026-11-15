@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
 import TopBar from '@/components/TopBar';
+import { ordersService } from '@/lib/ordersService';
 
 type TableStatus = 'VACANT' | 'OCCUPIED' | 'RUNNING_KOT' | 'BILLED' | 'RESERVED' | 'NEEDS_CLEANING';
 
@@ -82,6 +83,47 @@ export default function TablesPage() {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
   };
+
+  // Live Supabase Tables & Realtime Sync
+  useEffect(() => {
+    async function loadTables() {
+      try {
+        const liveTables = await ordersService.fetchTables();
+        if (liveTables && liveTables.length > 0) {
+          const mapped: DiningTable[] = liveTables.map((t: any) => ({
+            id: t.id,
+            table_number: t.table_number,
+            section: t.floor_section || 'AC Main Hall',
+            capacity: t.seating_capacity || 4,
+            status: t.status as TableStatus,
+            active_bill: t.status === 'RUNNING_KOT' ? 1250 : (t.status === 'OCCUPIED' ? 890 : 0),
+            covers: t.seating_capacity || 4,
+            captain: 'Staff',
+          }));
+          setTables((prev) => {
+            const merged = [...mapped];
+            for (const p of prev) {
+              if (!merged.some((m) => m.table_number === p.table_number)) {
+                merged.push(p);
+              }
+            }
+            return merged;
+          });
+        }
+      } catch (e) {
+        console.warn('Error loading live dining tables', e);
+      }
+    }
+    loadTables();
+
+    const unsubscribe = ordersService.subscribeToTables(() => {
+      loadTables();
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   // Status style dictionary (PetPooja standard 6 states)
   const statusConfig: Record<TableStatus, { border: string; bg: string; text: string; badge: string; label: string; dot: string }> = {
@@ -224,6 +266,10 @@ export default function TablesPage() {
       })
     );
 
+    if (mergePrimaryId.length > 20 && mergeSecondaryId.length > 20) {
+      ordersService.mergeTables(mergePrimaryId, mergeSecondaryId, 'Merged by floor captain', 'CAPTAIN').catch(console.error);
+    }
+
     showToast(`Tables merged successfully into single running order`);
     setIsMergeModalOpen(false);
   };
@@ -261,6 +307,10 @@ export default function TablesPage() {
         return t;
       })
     );
+
+    if (transferFromId.length > 20 && transferToId.length > 20) {
+      ordersService.transferTable(fromTable.id, transferFromId, transferToId, 'Transferred by floor captain', 'CAPTAIN').catch(console.error);
+    }
 
     showToast(`Order transferred from ${fromTable.table_number} to target table`);
     setIsTransferModalOpen(false);

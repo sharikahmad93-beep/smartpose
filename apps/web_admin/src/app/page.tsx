@@ -1,11 +1,62 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
 import TopBar from '@/components/TopBar';
+import { createClient } from '@/lib/supabase/client';
 
 export default function DashboardPage() {
+  const [liveGrossSales, setLiveGrossSales] = useState<number>(48250);
+  const [liveOrderCount, setLiveOrderCount] = useState<number>(112);
+  const [liveOccupiedTables, setLiveOccupiedTables] = useState<number>(7);
+  const [liveTotalTables, setLiveTotalTables] = useState<number>(10);
+  const [liveKdsTickets, setLiveKdsTickets] = useState<number>(5);
+
+  useEffect(() => {
+    async function loadDashboardMetrics() {
+      try {
+        const supabase = createClient();
+        // 1. Settled Orders
+        const { data: settledOrders } = await supabase
+          .from('orders')
+          .select('total')
+          .eq('status', 'SETTLED');
+
+        if (settledOrders && settledOrders.length > 0) {
+          const sum = settledOrders.reduce((acc, o) => acc + (Number(o.total) || 0), 0);
+          setLiveGrossSales(Math.round(sum));
+          setLiveOrderCount(settledOrders.length);
+        }
+
+        // 2. Dining Tables
+        const { data: tables } = await supabase
+          .from('dining_tables')
+          .select('status');
+
+        if (tables && tables.length > 0) {
+          setLiveTotalTables(tables.length);
+          const occupied = tables.filter((t) => t.status !== 'VACANT').length;
+          setLiveOccupiedTables(occupied);
+        }
+
+        // 3. Live KOT Tickets
+        const { data: kots } = await supabase
+          .from('kot_tickets')
+          .select('id')
+          .in('status', ['FIRED', 'PREPARING']);
+
+        if (kots) {
+          setLiveKdsTickets(kots.length);
+        }
+      } catch (e) {
+        console.warn('Dashboard live query fallback');
+      }
+    }
+
+    loadDashboardMetrics();
+  }, []);
+
   const hourlyData = [
     { hour: '11 AM', sales: 4200, orders: 12 },
     { hour: '12 PM', sales: 8600, orders: 22 },
@@ -35,8 +86,8 @@ export default function DashboardPage() {
                 <span className="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full text-[11px] font-black">+18.2%</span>
               </div>
               <div className="mt-3">
-                <span className="text-3xl font-black text-slate-900 font-mono">₹48,250</span>
-                <p className="text-xs text-slate-400 mt-1">112 orders settled across 2 outlets</p>
+                <span className="text-3xl font-black text-slate-900 font-mono">₹{liveGrossSales.toLocaleString('en-IN')}</span>
+                <p className="text-xs text-slate-400 mt-1">{liveOrderCount} orders settled in database</p>
               </div>
             </div>
 
@@ -46,8 +97,8 @@ export default function DashboardPage() {
                 <span className="text-orange-700 bg-orange-100 px-2 py-0.5 rounded-full text-[11px] font-black">Floor Live</span>
               </div>
               <div className="mt-3">
-                <span className="text-3xl font-black text-slate-900 font-mono">7 / 10</span>
-                <p className="text-xs text-slate-400 mt-1">70% current occupancy in Indiranagar</p>
+                <span className="text-3xl font-black text-slate-900 font-mono">{liveOccupiedTables} / {liveTotalTables}</span>
+                <p className="text-xs text-slate-400 mt-1">{liveTotalTables > 0 ? Math.round((liveOccupiedTables / liveTotalTables) * 100) : 0}% current occupancy in Indiranagar</p>
               </div>
             </div>
 
@@ -57,8 +108,8 @@ export default function DashboardPage() {
                 <span className="text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full text-[11px] font-black">KDS Live</span>
               </div>
               <div className="mt-3">
-                <span className="text-3xl font-black text-slate-900 font-mono">5 Tickets</span>
-                <p className="text-xs text-slate-400 mt-1">Avg cooking prep time: 14 mins</p>
+                <span className="text-3xl font-black text-slate-900 font-mono">{liveKdsTickets} Tickets</span>
+                <p className="text-xs text-slate-400 mt-1">Realtime kitchen orders active</p>
               </div>
             </div>
 
