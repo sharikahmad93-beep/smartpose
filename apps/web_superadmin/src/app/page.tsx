@@ -9,19 +9,19 @@ interface RestaurantTenant {
   ownerName: string;
   phone: string;
   outletsCount: number;
-  plan: 'Starter' | 'Pro' | 'Enterprise';
+  plan: string;
   mrrAmount: number;
   status: 'ACTIVE' | 'TRIAL' | 'SUSPENDED';
   joinedDate: string;
 }
 
 const INITIAL_TENANTS: RestaurantTenant[] = [
-  { id: 't-1', name: 'Biryani Express Cloud Kitchens', ownerName: 'Vikramaditya Rao', phone: '+91 98450 11223', outletsCount: 6, plan: 'Enterprise', mrrAmount: 18000, status: 'ACTIVE', joinedDate: '12 Jan 2026' },
-  { id: 't-2', name: 'Rolls & Bowls Co.', ownerName: 'Sameer Sen', phone: '+91 99120 44551', outletsCount: 3, plan: 'Pro', mrrAmount: 8997, status: 'ACTIVE', joinedDate: '04 Feb 2026' },
-  { id: 't-3', name: 'The Kebab & Tikka House', ownerName: 'Ananya Sharma', phone: '+91 97722 33110', outletsCount: 2, plan: 'Pro', mrrAmount: 5998, status: 'ACTIVE', joinedDate: '18 Mar 2026' },
-  { id: 't-4', name: 'Chai & Mithaas Artisan Cafe', ownerName: 'Rahul Mehta', phone: '+91 98110 99887', outletsCount: 1, plan: 'Starter', mrrAmount: 1499, status: 'TRIAL', joinedDate: '10 Nov 2026' },
-  { id: 't-5', name: 'Punjab Grill & Curry Central', ownerName: 'Harpreet Singh', phone: '+91 99881 22334', outletsCount: 4, plan: 'Enterprise', mrrAmount: 12000, status: 'ACTIVE', joinedDate: '22 Apr 2026' },
-  { id: 't-6', name: 'Coastal Spice Seafood Shack', ownerName: 'Kiran Kamath', phone: '+91 97330 66778', outletsCount: 2, plan: 'Pro', mrrAmount: 5998, status: 'SUSPENDED', joinedDate: '15 May 2026' },
+  { id: 't-1', name: 'Biryani Express Cloud Kitchens', ownerName: 'Vikramaditya Rao', phone: '+91 98450 11223', outletsCount: 6, plan: 'Operations - Scale', mrrAmount: 30000, status: 'ACTIVE', joinedDate: '12 Jan 2026' },
+  { id: 't-2', name: 'Rolls & Bowls Co.', ownerName: 'Sameer Sen', phone: '+91 99120 44551', outletsCount: 3, plan: 'Operations - Growth', mrrAmount: 20000, status: 'ACTIVE', joinedDate: '04 Feb 2026' },
+  { id: 't-3', name: 'The Kebab & Tikka House', ownerName: 'Ananya Sharma', phone: '+91 97722 33110', outletsCount: 2, plan: 'Marketing - Growth', mrrAmount: 20000, status: 'ACTIVE', joinedDate: '18 Mar 2026' },
+  { id: 't-4', name: 'Chai & Mithaas Artisan Cafe', ownerName: 'Rahul Mehta', phone: '+91 98110 99887', outletsCount: 1, plan: 'Base Plan', mrrAmount: 12000, status: 'TRIAL', joinedDate: '10 Nov 2026' },
+  { id: 't-5', name: 'Punjab Grill & Curry Central', ownerName: 'Harpreet Singh', phone: '+91 99881 22334', outletsCount: 4, plan: 'Operations - Scale', mrrAmount: 30000, status: 'ACTIVE', joinedDate: '22 Apr 2026' },
+  { id: 't-6', name: 'Coastal Spice Seafood Shack', ownerName: 'Kiran Kamath', phone: '+91 97330 66778', outletsCount: 2, plan: 'Marketing - Core', mrrAmount: 10000, status: 'SUSPENDED', joinedDate: '15 May 2026' },
 ];
 
 export default function SuperAdminDashboard() {
@@ -30,7 +30,7 @@ export default function SuperAdminDashboard() {
   const [newBrandName, setNewBrandName] = useState('');
   const [newOwner, setNewOwner] = useState('');
   const [newPhone, setNewPhone] = useState('');
-  const [newPlan, setNewPlan] = useState<'Starter' | 'Pro' | 'Enterprise'>('Pro');
+  const [newPlan, setNewPlan] = useState('Operations - Growth');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -42,6 +42,11 @@ export default function SuperAdminDashboard() {
     e.preventDefault();
     if (!newBrandName || !newOwner) return;
 
+    const planPrice = 
+      newPlan.includes('Scale') ? 30000 : 
+      newPlan.includes('Growth') ? 20000 : 
+      newPlan.includes('Core') ? 10000 : 12000;
+
     const newTenant: RestaurantTenant = {
       id: `t-${Date.now()}`,
       name: newBrandName,
@@ -49,7 +54,7 @@ export default function SuperAdminDashboard() {
       phone: newPhone || '+91 98000 00000',
       outletsCount: 1,
       plan: newPlan,
-      mrrAmount: newPlan === 'Enterprise' ? 5999 : newPlan === 'Pro' ? 2999 : 1499,
+      mrrAmount: planPrice,
       status: 'ACTIVE',
       joinedDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
     };
@@ -141,26 +146,26 @@ export default function SuperAdminDashboard() {
         {/* Plan Breakdown Progress Bar */}
         <div className="bg-slate-900/90 p-5 rounded-3xl border border-slate-800 shadow-xl my-6 space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="font-bold text-xs uppercase tracking-wider text-slate-400">SaaS Plan Distribution</h4>
+            <h4 className="font-bold text-xs uppercase tracking-wider text-slate-400">SaaS Suite Distribution</h4>
             <span className="text-xs text-slate-400">Churn Rate: &lt; 0.8%</span>
           </div>
           <div className="w-full h-3 rounded-full bg-slate-800 flex overflow-hidden">
-            <div className="bg-orange-500 h-full" style={{ width: '52%' }} title="Enterprise (52%)"></div>
-            <div className="bg-amber-500 h-full" style={{ width: '34%' }} title="Pro (34%)"></div>
-            <div className="bg-blue-500 h-full" style={{ width: '14%' }} title="Starter (14%)"></div>
+            <div className="bg-rose-500 h-full" style={{ width: '45%' }} title="Operations Manager (45%)"></div>
+            <div className="bg-amber-500 h-full" style={{ width: '35%' }} title="Base Plan (35%)"></div>
+            <div className="bg-blue-500 h-full" style={{ width: '20%' }} title="Marketing Manager (20%)"></div>
           </div>
-          <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
+          <div className="flex flex-wrap items-center justify-between text-xs text-slate-400 pt-1 gap-2">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
-              <span>Enterprise (₹5,999/mo) • 52%</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+              <span>Operations Suite (from ₹20,000/yr) • 45%</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-              <span>Pro (₹2,999/mo) • 34%</span>
+              <span>Base Plan (₹12,000/yr) • 35%</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-              <span>Starter (₹1,499/mo) • 14%</span>
+              <span>Marketing Suite (from ₹10,000/yr) • 20%</span>
             </div>
           </div>
         </div>
@@ -210,9 +215,9 @@ export default function SuperAdminDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2.5 py-1 rounded-lg text-[10px] font-bold ${
-                          t.plan === 'Enterprise'
-                            ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
-                            : t.plan === 'Pro'
+                          t.plan.includes('Scale')
+                            ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                            : t.plan.includes('Growth')
                             ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                             : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
                         }`}
@@ -309,12 +314,15 @@ export default function SuperAdminDashboard() {
                   <label className="font-bold text-slate-300 block mb-1">Select SaaS Subscription Plan</label>
                   <select
                     value={newPlan}
-                    onChange={(e) => setNewPlan(e.target.value as 'Starter' | 'Pro' | 'Enterprise')}
+                    onChange={(e) => setNewPlan(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white"
                   >
-                    <option value="Starter">Starter Plan — ₹1,499/mo (1 Outlet, POS & QR)</option>
-                    <option value="Pro">Pro Plan — ₹2,999/mo (Up to 3 Outlets, POS, KDS & Inventory)</option>
-                    <option value="Enterprise">Enterprise Plan — ₹5,999/mo (Unlimited Outlets, Aggregators, AI)</option>
+                    <option value="Base Plan">Base Plan — ₹12,000/yr (Cloud Billing, 90+ Reports, Inventory, AI)</option>
+                    <option value="Operations - Growth">Operations Manager: Growth — ₹20,000/yr (Captain App, KDS, Swiggy/Zomato Reconcile)</option>
+                    <option value="Operations - Scale">Operations Manager: Scale — ₹30,000/yr (TRM, Kiosk, E-Invoice 1000 Credits)</option>
+                    <option value="Marketing - Core">Marketing Manager: Core — ₹10,000/yr (CRM, Loyalty, 4,000 WABA Credits)</option>
+                    <option value="Marketing - Growth">Marketing Manager: Growth — ₹20,000/yr (Website/OOW, 8,000 WABA Credits)</option>
+                    <option value="Marketing - Scale">Marketing Manager: Scale — ₹30,000/yr (Meta Ads/Influencer, 10,000 WABA Credits)</option>
                   </select>
                 </div>
 
