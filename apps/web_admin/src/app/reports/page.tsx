@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
+import TopBar from '@/components/TopBar';
 
 export default function ReportsAndAnalyticsPage() {
   const [dateRange, setDateRange] = useState<'TODAY' | 'YESTERDAY' | 'LAST_7_DAYS' | 'THIS_MONTH'>('TODAY');
@@ -32,10 +33,14 @@ export default function ReportsAndAnalyticsPage() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-slate-50 font-sans">
       <Sidebar activeTab="reports" />
 
-      <main className="flex-1 p-8 overflow-y-auto">
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <TopBar />
+
+        <main className="flex-1 p-8 overflow-y-auto">
         {/* Header */}
         <header className="flex flex-col lg:flex-row lg:items-center justify-between pb-6 border-b border-slate-200 gap-4">
           <div>
@@ -273,6 +278,7 @@ export default function ReportsAndAnalyticsPage() {
           </div>
         </section>
       </main>
+      </div>
     </div>
   );
 }

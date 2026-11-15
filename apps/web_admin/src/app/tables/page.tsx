@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
+import TopBar from '@/components/TopBar';
 
 interface DemoTable {
   id: string;
@@ -40,11 +41,14 @@ export default function TablesPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-slate-50 font-sans">
       <Sidebar activeTab="tables" />
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <TopBar />
+
+        <main className="flex-1 p-8 overflow-y-auto">
         <header className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-200 gap-4">
           <div>
             <h2 className="text-2xl font-black tracking-tight text-slate-900">Live Dining Tables &amp; Floor Plan</h2>
@@ -119,6 +123,7 @@ export default function TablesPage() {
           ))}
         </div>
       </main>
+      </div>
     </div>
   );
 }
