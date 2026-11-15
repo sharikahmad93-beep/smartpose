@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npm --prefix apps/web_admin run build"
+    "build": "cd apps/web_admin && npm install && npm run build",
+    "deploy": "cd apps/web_admin && npm install && npm run build && cd ../.. && npx wrangler deploy"
   }
 }
