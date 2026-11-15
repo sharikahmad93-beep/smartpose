@@ -1,3 +1,38 @@
+enum AppRole {
+  waiter,
+  kitchen,
+  manager,
+  owner,
+}
+
+extension AppRoleExtension on AppRole {
+  String get title {
+    switch (this) {
+      case AppRole.waiter:
+        return 'Captain / Waiter App';
+      case AppRole.kitchen:
+        return 'Kitchen KDS App';
+      case AppRole.manager:
+        return 'Store Manager App';
+      case AppRole.owner:
+        return 'Owner Analytics App';
+    }
+  }
+
+  String get badge {
+    switch (this) {
+      case AppRole.waiter:
+        return '📱 WAITER';
+      case AppRole.kitchen:
+        return '🍳 KITCHEN';
+      case AppRole.manager:
+        return '👔 MANAGER';
+      case AppRole.owner:
+        return '👑 OWNER';
+    }
+  }
+}
+
 class DiningTable {
   final String id;
   final String name;
