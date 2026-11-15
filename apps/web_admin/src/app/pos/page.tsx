@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { ordersService } from '@/lib/ordersService';
+import { billingEngine } from '@/lib/billingEngine';
 
 interface MenuItem {
   id: string;
@@ -376,20 +377,37 @@ export default function PosBillingPage() {
     }
   };
 
-  // Financial Calculations
-  const subtotal = useMemo(() => cart.reduce((acc, item) => acc + item.price * item.quantity, 0), [cart]);
-  const discountAmount = useMemo(() => (subtotal * discountPercent) / 100, [subtotal, discountPercent]);
-  // 1 loyalty point = ₹0.50 discount
-  const loyaltyDiscount = isRedeemingPoints ? Math.min(subtotal - discountAmount, customerLoyaltyPoints * 0.5) : 0;
-  const taxableAmount = Math.max(0, subtotal - discountAmount - loyaltyDiscount);
-  const packagingFee = isPackagingApplicable ? packagingCharge : 0;
-  const cgst = taxableAmount * 0.025; // 2.5% CGST
-  const sgst = taxableAmount * 0.025; // 2.5% SGST
-  const grandTotal = Math.round(taxableAmount + packagingFee + cgst + sgst);
+  // Financial Calculations via shared billingEngine
+  const billCalc = useMemo(() => {
+    const totalDiscountVal = discountPercent > 0 
+      ? { type: 'PERCENT' as const, value: discountPercent }
+      : (isRedeemingPoints ? { type: 'FLAT' as const, value: customerLoyaltyPoints * 0.5 } : { type: 'NONE' as const, value: 0 });
+    
+    return billingEngine.calculateBill(cart, totalDiscountVal, orderType, 0.05);
+  }, [cart, discountPercent, isRedeemingPoints, customerLoyaltyPoints, orderType]);
 
-  // Multi-Tender Split Calculation
-  const totalTendered = (Number(tenderCash) || 0) + (Number(tenderUpi) || 0) + (Number(tenderCard) || 0) + (Number(tenderDue) || 0);
-  const balanceRemaining = grandTotal - totalTendered;
+  const subtotal = billCalc.subtotal;
+  const discountAmount = billCalc.discountAmount;
+  const loyaltyDiscount = isRedeemingPoints ? discountAmount : 0;
+  const taxableAmount = billCalc.taxableAmount;
+  const packagingFee = billCalc.packagingCharges;
+  const cgst = billCalc.cgst;
+  const sgst = billCalc.sgst;
+  const grandTotal = billCalc.grandTotal;
+
+  // Multi-Tender Split Calculation via shared billingEngine
+  const paymentValidation = useMemo(() => {
+    const tenders = [
+      { mode: 'CASH' as const, amount: Number(tenderCash) || 0 },
+      { mode: 'UPI' as const, amount: Number(tenderUpi) || 0 },
+      { mode: 'CARD' as const, amount: Number(tenderCard) || 0 },
+      { mode: 'DUE' as const, amount: Number(tenderDue) || 0 },
+    ].filter(t => t.amount > 0);
+    return billingEngine.validatePayments(grandTotal, tenders);
+  }, [grandTotal, tenderCash, tenderUpi, tenderCard, tenderDue]);
+
+  const totalTendered = paymentValidation.totalPaid;
+  const balanceRemaining = Math.max(0, paymentValidation.balance);
   const changeDue = Math.max(0, (Number(tenderCash) || 0) - (grandTotal - (Number(tenderUpi) || 0) - (Number(tenderCard) || 0)));
 
   // Cart Operations

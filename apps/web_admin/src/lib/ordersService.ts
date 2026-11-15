@@ -21,6 +21,7 @@ export interface CreateOrderParams {
     notes?: string;
   }>;
   staffRole?: string;
+  idempotencyKey?: string;
 }
 
 export interface PaymentItem {
@@ -36,6 +37,7 @@ export interface SettleOrderParams {
   discountType?: 'NONE' | 'PERCENT' | 'FLAT' | 'COUPON';
   discountReason?: string;
   staffRole?: string;
+  idempotencyKey?: string;
 }
 
 export const ordersService = {
@@ -43,9 +45,10 @@ export const ordersService = {
     return createClient();
   },
 
-  // 1. Create order via atomic RPC
+  // 1. Create order via atomic RPC with client-generated idempotency key
   async createOrder(params: CreateOrderParams) {
     const supabase = this.getSupabase();
+    const idempKey = params.idempotencyKey || `idemp-ord-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
     try {
       const { data, error } = await supabase.rpc('create_order', {
         p_tenant_id: params.tenantId || DEFAULT_TENANT_ID,
@@ -57,13 +60,14 @@ export const ordersService = {
         p_captain_name: params.captainName || 'Staff',
         p_items: params.items,
         p_staff_role: params.staffRole || 'CASHIER',
+        p_idempotency_key: idempKey,
       });
 
       if (error) throw error;
       return { success: true, ...data };
     } catch (err: any) {
       console.warn('Network or DB error on createOrder, buffering to offline queue:', err.message);
-      this.bufferOfflineOrder(params);
+      this.bufferOfflineOrder({ ...params, idempotencyKey: idempKey });
       return {
         success: true,
         offline: true,
@@ -113,6 +117,7 @@ export const ordersService = {
   // 4. Settle Order (Payments + FY Invoice Sequence + BOM Stock Deduction)
   async settleOrder(params: SettleOrderParams) {
     const supabase = this.getSupabase();
+    const idempKey = params.idempotencyKey || `idemp-stl-${params.orderId}`;
     try {
       const { data, error } = await supabase.rpc('settle_order', {
         p_order_id: params.orderId,
@@ -121,6 +126,7 @@ export const ordersService = {
         p_discount_type: params.discountType || 'NONE',
         p_discount_reason: params.discountReason || null,
         p_staff_role: params.staffRole || 'CASHIER',
+        p_idempotency_key: idempKey,
       });
 
       if (error) throw error;
